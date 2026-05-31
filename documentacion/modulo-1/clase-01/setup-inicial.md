@@ -126,7 +126,7 @@ export class AppModule {}
 | `Modulo1Module` | Agrupa los controladores del módulo 1 (clase 01, 02, …) |
 | `Modulo2Module` | Reservado para la fase n8n + LLM |
 
-**Diferencia importante con la práctica de Textract del README:** allí se muestra un `DatabaseModule` antiguo con `DatabaseService` y `pg` directo. En el esqueleto del curso la base de datos va con **TypeORM** (`database.module.ts` + entidades + migraciones). Para autenticación y para el resto del módulo 1 usa siempre este enfoque.
+**Diferencia importante con versiones anteriores del material:** si ves ejemplos con `DatabaseService` y `pg` directo, no los uses en este esqueleto. En el curso la base de datos va con **TypeORM** (`database.module.ts` + entidades + migraciones). Para autenticación y para el resto del módulo 1 usa siempre este enfoque.
 
 **No** registres `AuthModule` en `AppModule`. Se importa solo desde `Modulo1Module`, así cada módulo de clase controla sus propios guards.
 
@@ -492,4 +492,4 @@ curl -i http://localhost:3000/modulo1/clase01/test
 
 ## Siguiente paso
 
-Cuando la autenticación funcione, continúa con la [parte práctica de Textract](./README.md#parte-práctica) del README de la clase 1 (`POST /modulo1/clase01/textract/text`). Los nuevos endpoints de documentos también deberán estar protegidos con el mismo patrón (`@UseGuards(ApiKeyGuard)` o a nivel de controller).
+Cuando la autenticación funcione, continúa con la [parte práctica de Textract](./Clase.md#parte-práctica) de la clase 1 (`POST /modulo1/clase01/textract/text`). Los nuevos endpoints de documentos también deberán estar protegidos con el mismo patrón (`@UseGuards(ApiKeyGuard)` o a nivel de controller).

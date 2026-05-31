@@ -24,7 +24,7 @@ npm run start:dev
 
 ## Docker local
 
-Ver [README principal](../README.md) (mono-repo del curso). Los archivos `Dockerfile` y `docker-compose.yml` están vacíos hasta que se publique la imagen base.
+Los archivos `Dockerfile` y `docker-compose.yml` están vacíos hasta que se publique la imagen base del curso.
 
 ## Health
 

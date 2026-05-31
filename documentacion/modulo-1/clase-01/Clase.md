@@ -161,7 +161,7 @@ Trabaja en tu repo **esqueleto** (local o en Render).
 
 Antes de Textract, deja la API lista con Postgres, migraciones, seed y el endpoint de prueba autenticado.
 
-**Guía paso a paso (código, variables, migraciones y seed):** [setup-autenticacion.md](./setup-autenticacion.md)
+**Guía paso a paso (código, variables, migraciones y seed):** [setup-inicial.md](./setup-inicial.md)
 
 Resumen rápido:
 
@@ -205,7 +205,7 @@ En el endpoint enviaremos el **nombre del objeto en S3** (la clave dentro del bu
 
 ### 2. Dependencias AWS y variables
 
-El esqueleto ya incluye Nest, TypeORM, Postgres y scripts de migración/seed (ver [setup-autenticacion.md](./setup-autenticacion.md)). Añade solo el SDK de Textract:
+El esqueleto ya incluye Nest, TypeORM, Postgres y scripts de migración/seed (ver [setup-inicial.md](./setup-inicial.md)). Añade solo el SDK de Textract:
 
 ```bash
 npm install @aws-sdk/client-textract
@@ -390,7 +390,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
 import { Clase01Controller } from './clase01/clase01.controller';
-import { Clase01Service } from './clase01/clase01.service';
 import { Clase01Service } from './clase01/clase01.service';
 import { RawDocumentText } from '../entities/raw-document-text.entity';
 import { TextractService } from './clase01/textract.service';

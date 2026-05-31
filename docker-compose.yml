@@ -1,6 +1,11 @@
-# Empty template — final docker-compose will be published later.
-#
-# Planned:
-#   - "api" service built from ./Dockerfile
-#   - port 3000 exposed
-#   - environment variables from .env
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      PORT: 3000
