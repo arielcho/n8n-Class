@@ -110,19 +110,19 @@ Extraer datos de documentos bancarios y exponerlos vía API REST.
 
 ---
 
-#### Clase 3 — Queries, documentos personalizados y pipeline unificado · 3 h
+#### Clase 3 — Textract Queries y expediente hipotecario · 3 h
 
 | | |
 |---|---|
 | **Controlador** | `Clase03Controller` |
 
-**Endpoints:** `POST .../textract/custom`, `POST .../textract/document`.
+**Endpoints:** `POST .../credit-files`, `POST .../credit-files/:applicationId/process`, `GET .../credit-files/:applicationId`.
 
-**Objetivos:** Textract Queries para formatos propios; catálogo de queries por tipo; endpoint inteligente por `documentType`; pipeline unificado de extractores.
+**Objetivos:** Crear el file del cliente; registrar documentos de un crédito hipotecario; usar Textract Queries para extraer datos personales, laborales, ingresos, banca, solicitud y endeudamiento; guardar resultados en base de datos.
 
-**Teoría:** Queries vs FORMS vs AnalyzeExpense; diseño de queries (lenguaje natural, alias); límite 15 queries; estrategia `tipo_documento → queries[]`.
+**Teoría:** Queries vs `AnalyzeID`; limitaciones del carné boliviano con `AnalyzeID`; diseño de queries por documento; modelo de datos para solicitudes, documentos, resultados, respuestas y datos consolidados.
 
-**Práctica:** `document-queries.config.ts` (certificado de trabajo, carta bancaria, contrato alquiler, declaración impuestos, etc.); `QueryExtractorService`; `POST /textract/custom`; enrutador `POST /textract/document` con respuesta normalizada; cada alumno añade un tipo nuevo con ≥ 5 queries.
+**Práctica:** Migraciones y entidades para `credit_applications`, `application_documents`, `textract_results`, `textract_query_answers` y `application_extracted_data`; `Clase03Service`; creación y procesamiento del expediente hipotecario.
 
 ---
 
@@ -130,19 +130,19 @@ Extraer datos de documentos bancarios y exponerlos vía API REST.
 
 Refinar datos extraídos: limpieza, normalización y feature engineering para ML.
 
-#### Clase 4 — Transformación de datos con AWS Glue: fundamentos · 3 h
+#### Clase 4 — AWS Glue para limpiar el expediente hipotecario · 3 h
 
 | | |
 |---|---|
 | **Controlador** | `Clase04Controller` |
 
-**Endpoints:** `POST .../glue/transform`, `GET .../glue/jobs/:jobRunId`.
+**Endpoints:** `POST .../credit-files`, `POST .../credit-files/clean`, `GET .../credit-files/:applicationId/clean-status`.
 
-**Objetivos:** Arquitectura Glue (Data Catalog, Crawlers, Jobs); job que limpie JSON de Textract; normalizar campos clave para ML.
+**Objetivos:** Usar Glue para limpiar y homologar los datos extraídos; convertir fechas, montos y booleanos; registrar un perfil limpio del cliente.
 
-**Teoría:** Glue Data Catalog, Crawlers, Jobs Spark / Python Shell; DynamicFrame vs DataFrame; transformaciones (`ResolveChoice`, `DropNullFields`, `Map`, `Filter`); data lake en S3 y particionamiento.
+**Teoría:** Glue como capa de transformación; patrón asíncrono con `StartJobRun` y `GetJobRun`; diferencia entre extracción y limpieza; calidad de datos y campos faltantes.
 
-**Práctica:** Glue Job Python Shell: leer JSON en S3, filtrar `confidence < 80%`, `snake_case`, tipos fecha/monto; salida Parquet; Crawler; NestJS dispara y consulta el job; batch ~10 documentos.
+**Práctica:** Endpoint unificado que recibe documentos, crea el expediente, procesa Textract y lanza Glue; script Python Shell para normalizar datos; tabla `clean_credit_profiles`; polling del job.
 
 ---
 
@@ -152,13 +152,13 @@ Refinar datos extraídos: limpieza, normalización y feature engineering para ML
 |---|---|
 | **Controlador** | `Clase05Controller` |
 
-**Endpoints:** `POST .../glue/features`, `GET .../features/status/:jobRunId`, `GET .../features/schema`.
+**Endpoints:** `POST .../credit-files/features`, `GET .../credit-files/:applicationId/features-status`, `GET .../credit-files/:applicationId/features`.
 
-**Objetivos:** Variables derivadas para crédito; integrar formulario + identidad + estado de cuenta; dataset final para SageMaker.
+**Objetivos:** Crear variables derivadas para crédito hipotecario; generar un set de features por expediente; preparar datos para SageMaker.
 
-**Teoría:** Features de crédito (ratio deuda/ingreso, historial de pagos, antigüedad laboral); join de DynamicFrames; imputación de nulos; one-hot encoding.
+**Teoría:** Feature engineering; ratios y scores sintéticos; diferencia entre datos limpios, features y etiquetas; advertencia sobre reglas didácticas no bancarias.
 
-**Práctica:** Job Spark: join por `solicitud_id`; `debt_to_income_ratio`, `payment_history_score`, `employment_tenure_months`, `has_guarantor`; one-hot `tipo_empleo`, `sector_economico`; exportar `features.parquet`; explorar con Athena/Glue Studio.
+**Práctica:** Job Glue para generar `debt_to_income_ratio`, `loan_to_value_ratio`, `payment_to_income_ratio`, `employment_stability_score`, `banking_capacity_score`, `credit_history_score` y `synthetic_risk_label`; guardar en `credit_feature_sets`.
 
 ---
 
@@ -166,7 +166,7 @@ Refinar datos extraídos: limpieza, normalización y feature engineering para ML
 
 Entrenar y desplegar modelos de riesgo y monto de crédito.
 
-#### Clase 6 — Modelo 1: clasificación de riesgo crediticio (regresión logística) · 3 h
+#### Clase 6 — SageMaker, Machine Learning básico y modelo de riesgo · 3 h
 
 | | |
 |---|---|
@@ -174,15 +174,15 @@ Entrenar y desplegar modelos de riesgo y monto de crédito.
 
 **Endpoints:** `POST .../sagemaker/train-risk`, `GET .../train-risk/:jobName`, `GET .../models/risk/metrics`.
 
-**Objetivos:** SageMaker Studio; entrenar regresión logística para mora; métricas bancarias AUC-ROC, KS, Gini.
+**Objetivos:** Introducir clasificación, regresión y clustering; generar datos sintéticos coherentes con crédito hipotecario; entrenar regresión logística para riesgo.
 
-**Teoría:** Studio, experimentos, Model Registry; regresión logística y contexto ASFI; AUC-ROC, KS, Gini, PSI; clases desbalanceadas (`class_weight`, SMOTE).
+**Teoría:** Tipos de modelos de ML; regresión logística como clasificador; datos sintéticos explicables; AUC, matriz de confusión, precision y recall.
 
-**Práctica:** Cargar `features.parquet`; split 70/15/15; SKLearn Estimator `train.py`; matriz de confusión; registrar modelo; API para lanzar/consultar training; meta AUC-ROC ≥ 0,75.
+**Práctica:** `generate_synthetic_mortgage_dataset.py`; notebook en SageMaker; `train_risk_logistic.py`; endpoints NestJS para training job, estado y métricas.
 
 ---
 
-#### Clase 7 — Modelo 2: predicción de monto de crédito (XGBoost) · 3 h
+#### Clase 7 — SageMaker y modelo de monto recomendado con XGBoost · 3 h
 
 | | |
 |---|---|
@@ -190,27 +190,27 @@ Entrenar y desplegar modelos de riesgo y monto de crédito.
 
 **Endpoints:** `POST .../sagemaker/train-amount`, `GET .../train-amount/:jobName`, `GET .../models/amount/metrics`, `GET .../models/compare`.
 
-**Objetivos:** XGBoost para monto óptimo; comparar con modelo logístico; implicaciones regulatorias de modelos complejos.
+**Objetivos:** Entrenar un modelo de regresión para monto recomendado; comparar clasificación vs regresión; usar XGBoost con datos tabulares.
 
-**Teoría:** Gradient boosting; clasificación (aprobar/rechazar) vs regresión (monto en Bs); RMSE, MAE, R²; tradeoff precisión vs explicabilidad ASFI.
+**Teoría:** Regresión como predicción numérica; gradient boosting; XGBoost; RMSE, MAE y R2; diferencia entre métricas de clasificación y regresión.
 
-**Práctica:** Target `monto_otorgado`; contenedor XGBoost built-in; hyperparameter tuning (opcional); feature importance; Model Registry; endpoint comparativo de métricas.
+**Práctica:** Notebook SageMaker con XGBoost; `train_amount_xgboost.py`; endpoints para iniciar entrenamiento, consultar estado, leer métricas y comparar ambos modelos.
 
 ---
 
-#### Clase 8 — SageMaker Endpoints: despliegue y evaluación en tiempo real · 3 h
+#### Clase 8 — SageMaker Endpoints y evaluación automática del file · 3 h
 
 | | |
 |---|---|
 | **Controlador** | `Clase08Controller` |
 
-**Endpoints:** `POST .../models/evaluate`, `POST .../models/risk`, `POST .../models/amount`.
+**Endpoints:** `POST .../credit-files/:applicationId/evaluate`, `POST .../models/risk`, `POST .../models/amount`.
 
-**Objetivos:** Desplegar ambos modelos como endpoints; consumirlos desde NestJS; comparar resultados con casos reales.
+**Objetivos:** Desplegar ambos modelos como endpoints; invocarlos desde NestJS; evaluar un file ya registrado usando sus features.
 
-**Teoría:** Tipos de endpoint (Real-time, Serverless, Async, Batch); instancias `ml.t2.medium` vs `ml.m5.large`; CSV vs JSON; costos y auto-scaling.
+**Teoría:** Entrenamiento vs inferencia; SageMaker real-time endpoints; orden de features; costos; decisión combinada didáctica.
 
-**Práctica:** Endpoints `credit-risk-classifier` y `credit-amount-predictor`; `SageMakerService`; `POST /models/evaluate`; colección Postman ~20 casos; documentar casos inesperados.
+**Práctica:** `SageMakerRuntimeService`; `InvokeEndpoint`; buscar `credit_feature_sets` por `applicationId`; invocar riesgo y monto; devolver `PRE_APPROVE_FOR_REVIEW`, `REVIEW_AMOUNT` o `REJECT_OR_MANUAL_REVIEW`.
 
 ---
 
