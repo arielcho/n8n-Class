@@ -1,0 +1,369 @@
+{
+  "info": {
+    "_postman_id": "99c720c6-f395-4393-b6e2-06a0cdb3948a",
+    "name": "Curso Agentes N8N",
+    "description": "Pruebas locales para setup inicial, Clase 1 Textract y Clase 2 Textract estructurado.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": []
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": []
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Setup Inicial",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('status ok', function () { pm.expect(pm.response.json().status).to.eql('ok'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Clase 01 - Test autenticado",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "x-api-secret",
+                "value": "{{apiSecret}}"
+              }
+            ],
+            "url": "{{baseUrl}}/modulo1/clase01/test"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('mensaje correcto', function () { pm.expect(pm.response.text()).to.eql('endpoint test autenticado'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Clase 01 - Test sin credenciales debe fallar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/modulo1/clase01/test"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Clase 01 - Textract",
+      "item": [
+        {
+          "name": "Extraer texto desde S3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "x-api-secret",
+                "value": "{{apiSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"{{textFileName}}\"\n}"
+            },
+            "url": "{{baseUrl}}/modulo1/clase01/textract/text"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200 o 201', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+                  "pm.test('devuelve lineas', function () { const json = pm.response.json(); pm.expect(json.lines).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Formato no soportado debe fallar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "x-api-secret",
+                "value": "{{apiSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"prueba.webp\"\n}"
+            },
+            "url": "{{baseUrl}}/modulo1/clase01/textract/text"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Clase 02 - Textract estructurado",
+      "item": [
+        {
+          "name": "Formulario - FORMS",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "x-api-secret",
+                "value": "{{apiSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"{{formFileName}}\"\n}"
+            },
+            "url": "{{baseUrl}}/modulo1/clase02/textract/form"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200 o 201', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+                  "pm.test('devuelve fields', function () { const json = pm.response.json(); pm.expect(json.fields).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Identidad - AnalyzeID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "x-api-secret",
+                "value": "{{apiSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"{{idFileName}}\"\n}"
+            },
+            "url": "{{baseUrl}}/modulo1/clase02/textract/id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200 o 201', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+                  "pm.test('devuelve fields', function () { const json = pm.response.json(); pm.expect(json.fields).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Estado de cuenta - TABLES",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "x-api-secret",
+                "value": "{{apiSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"{{statementFileName}}\"\n}"
+            },
+            "url": "{{baseUrl}}/modulo1/clase02/textract/statement"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200 o 201', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+                  "pm.test('devuelve tables', function () { const json = pm.response.json(); pm.expect(json.tables).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Boleta de pago - AnalyzeExpense",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "x-api-secret",
+                "value": "{{apiSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"{{payslipFileName}}\"\n}"
+            },
+            "url": "{{baseUrl}}/modulo1/clase02/textract/payslip"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200 o 201', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+                  "pm.test('devuelve summary y lineItems', function () { const json = pm.response.json(); pm.expect(json.summary).to.be.an('array'); pm.expect(json.lineItems).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Clase 02 - Formato no soportado debe fallar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "x-api-secret",
+                "value": "{{apiSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"prueba.webp\"\n}"
+            },
+            "url": "{{baseUrl}}/modulo1/clase02/textract/form"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
