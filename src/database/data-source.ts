@@ -1,6 +1,13 @@
 import { config } from 'dotenv';
 import { DataSource } from 'typeorm';
 import { ApiClient } from '../entities/api-client.entity';
+import { ApplicationDocument } from '../entities/application-document.entity';
+import { ApplicationExtractedData } from '../entities/application-extracted-data.entity';
+import { CreditApplication } from '../entities/credit-application.entity';
+import { DocumentType } from '../entities/document-type.entity';
+import { RawDocumentText } from '../entities/raw-document-text.entity';
+import { TextractQueryAnswer } from '../entities/textract-query-answer.entity';
+import { TextractResult } from '../entities/textract-result.entity';
 
 config();
 
@@ -40,7 +47,16 @@ export default new DataSource({
   type: 'postgres',
   url: databaseUrl,
   schema,
-  entities: [ApiClient],
+  entities: [
+    ApiClient,
+    RawDocumentText,
+    DocumentType,
+    CreditApplication,
+    ApplicationDocument,
+    TextractResult,
+    TextractQueryAnswer,
+    ApplicationExtractedData,
+  ],
   migrations: ['src/migrations/*.ts'],
   ssl,
 });
