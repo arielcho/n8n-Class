@@ -3,8 +3,10 @@ import { DataSource } from 'typeorm';
 import { ApiClient } from '../entities/api-client.entity';
 import { ApplicationDocument } from '../entities/application-document.entity';
 import { ApplicationExtractedData } from '../entities/application-extracted-data.entity';
+import { CleanCreditProfile } from '../entities/clean-credit-profile.entity';
 import { CreditApplication } from '../entities/credit-application.entity';
 import { DocumentType } from '../entities/document-type.entity';
+import { GlueJobRunEntity } from '../entities/glue-job-run.entity';
 import { RawDocumentText } from '../entities/raw-document-text.entity';
 import { TextractQueryAnswer } from '../entities/textract-query-answer.entity';
 import { TextractResult } from '../entities/textract-result.entity';
@@ -56,6 +58,8 @@ export default new DataSource({
     TextractResult,
     TextractQueryAnswer,
     ApplicationExtractedData,
+    CleanCreditProfile,
+    GlueJobRunEntity,
   ],
   migrations: ['src/migrations/*.ts'],
   ssl,

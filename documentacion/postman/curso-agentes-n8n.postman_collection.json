@@ -501,6 +501,115 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Clase 04 - Glue limpieza",
+      "item": [
+        {
+          "name": "Endpoint unificado - crear procesar y limpiar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "x-api-secret",
+                "value": "{{apiSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"applicantExternalId\": \"CLI-001\",\n  \"applicantName\": \"Cliente Demo\",\n  \"documents\": [\n    {\n      \"documentType\": \"CARNET_IDENTIDAD_BOLIVIANO\",\n      \"fileName\": \"{{ciFileName}}\"\n    },\n    {\n      \"documentType\": \"CERTIFICADO_TRABAJO\",\n      \"fileName\": \"{{employmentFileName}}\"\n    },\n    {\n      \"documentType\": \"BOLETA_PAGO\",\n      \"fileName\": \"{{mortgagePayslipFileName}}\"\n    },\n    {\n      \"documentType\": \"EXTRACTO_BANCARIO\",\n      \"fileName\": \"{{mortgageStatementFileName}}\"\n    },\n    {\n      \"documentType\": \"FORMULARIO_SOLICITUD_CREDITO\",\n      \"fileName\": \"{{loanFormFileName}}\"\n    },\n    {\n      \"documentType\": \"REPORTE_CREDITICIO_SIMULADO\",\n      \"fileName\": \"{{creditReportFileName}}\"\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/modulo1/clase04/credit-files"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200 o 201', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+                  "pm.test('guarda applicationId', function () { const json = pm.response.json(); pm.expect(json.applicationId).to.be.a('string'); pm.environment.set('applicationId', json.applicationId); });",
+                  "pm.test('devuelve cleanJob', function () { const json = pm.response.json(); pm.expect(json.cleanJob).to.be.an('object'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Limpiar expediente existente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "x-api-secret",
+                "value": "{{apiSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"applicationId\": \"{{applicationId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/modulo1/clase04/credit-files/clean"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200 o 201', function () { pm.expect([200, 201]).to.include(pm.response.code); });",
+                  "pm.test('devuelve jobRunId', function () { const json = pm.response.json(); pm.expect(json.jobRunId).to.be.a('string'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar estado limpieza",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "x-api-secret",
+                "value": "{{apiSecret}}"
+              }
+            ],
+            "url": "{{baseUrl}}/modulo1/clase04/credit-files/{{applicationId}}/clean-status"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('devuelve estado Glue', function () { const json = pm.response.json(); pm.expect(json.status).to.be.a('string'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
