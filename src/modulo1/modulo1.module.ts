@@ -31,5 +31,6 @@ import { Clase03Service } from './clase03/clase03.service';
   ],
   controllers: [Clase01Controller, Clase02Controller, Clase03Controller],
   providers: [Clase01Service, Clase02Service, Clase03Service, TextractService],
+  exports: [Clase03Service],
 })
 export class Modulo1Module {}

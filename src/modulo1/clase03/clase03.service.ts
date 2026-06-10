@@ -103,7 +103,6 @@ export class Clase03Service {
       const documentType = await this.getDocumentType(document.documentTypeCode);
       const textractQueries = this.toTextractQueries(documentType.queries);
       await this.clearPreviousTextractData(applicationId, document.id);
-
       const response = await this.textract.analyzeWithQueries(
         document.s3Key,
         textractQueries,
@@ -156,9 +155,7 @@ export class Clase03Service {
     }
 
     await this.rebuildExtractedData(applicationId);
-    await this.applications.update(application.id, {
-      status: 'TEXTRACT_COMPLETED',
-    });
+    await this.applications.update(application.id, { status: 'TEXTRACT_COMPLETED' });
 
     return {
       applicationId,
@@ -209,10 +206,7 @@ export class Clase03Service {
     return documentType;
   }
 
-  private async clearPreviousTextractData(
-    applicationId: string,
-    documentId: string,
-  ) {
+  private async clearPreviousTextractData(applicationId: string, documentId: string) {
     await this.queryAnswers.delete({ applicationId, documentId });
     await this.textractResults.delete({ applicationId, documentId });
   }
@@ -300,13 +294,9 @@ export class Clase03Service {
       },
     };
 
-    const existing = await this.extractedData.findOne({
-      where: { applicationId },
-    });
+    const existing = await this.extractedData.findOne({ where: { applicationId } });
     await this.extractedData.save(
-      existing
-        ? { ...existing, ...payload }
-        : this.extractedData.create(payload),
+      existing ? { ...existing, ...payload } : this.extractedData.create(payload),
     );
   }
 

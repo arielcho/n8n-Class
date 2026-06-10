@@ -26,3 +26,4 @@ export class TextractResult {
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 }
+

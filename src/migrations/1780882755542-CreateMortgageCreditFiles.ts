@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateMortgageCreditFiles1781000000000
+export class CreateMortgageCreditFiles1780882755542
   implements MigrationInterface
 {
-  name = 'CreateMortgageCreditFiles1781000000000';
+  name = 'CreateMortgageCreditFiles1780882755542';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     const schema = process.env.DATABASE_SCHEMA ?? 'public';
@@ -105,7 +105,7 @@ export class CreateMortgageCreditFiles1781000000000
     await queryRunner.query(`
       INSERT INTO ${q}."document_types" ("code", "name", "category", "queries")
       VALUES
-        ('CARNET_IDENTIDAD_BOLIVIANO', 'Carne de identidad boliviano', 'PERSONAL',
+        ('CARNET_IDENTIDAD_BOLIVIANO', 'Carné de identidad boliviano', 'PERSONAL',
           '[
             { "Text": "What is the identity document number?", "Alias": "identity_number_q1", "TargetAlias": "identity_number" },
             { "Text": "What number appears after No.?", "Alias": "identity_number_q2", "TargetAlias": "identity_number" },
@@ -155,7 +155,7 @@ export class CreateMortgageCreditFiles1781000000000
             { "Text": "What is the total withdrawals or debits?", "Alias": "total_withdrawals_q1", "TargetAlias": "total_withdrawals" },
             { "Text": "What is the total amount of cargos, debits, withdrawals, or expenses?", "Alias": "total_withdrawals_q2", "TargetAlias": "total_withdrawals" }
           ]'::jsonb),
-        ('FORMULARIO_SOLICITUD_CREDITO', 'Formulario de solicitud de credito', 'LOAN_REQUEST',
+        ('FORMULARIO_SOLICITUD_CREDITO', 'Formulario de solicitud de crédito', 'LOAN_REQUEST',
           '[
             { "Text": "What is the requested loan amount?", "Alias": "requested_amount_q1", "TargetAlias": "requested_amount" },
             { "Text": "What amount of credit, monto solicitado, or loan amount is requested?", "Alias": "requested_amount_q2", "TargetAlias": "requested_amount" },
@@ -185,7 +185,6 @@ export class CreateMortgageCreditFiles1781000000000
   public async down(queryRunner: QueryRunner): Promise<void> {
     const schema = process.env.DATABASE_SCHEMA ?? 'public';
     const q = `"${schema}"`;
-
     await queryRunner.query(`DROP TABLE IF EXISTS ${q}."application_extracted_data"`);
     await queryRunner.query(`DROP TABLE IF EXISTS ${q}."textract_query_answers"`);
     await queryRunner.query(`DROP TABLE IF EXISTS ${q}."textract_results"`);
