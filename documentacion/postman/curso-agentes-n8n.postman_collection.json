@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "99c720c6-f395-4393-b6e2-06a0cdb3948a",
     "name": "Curso Agentes N8N",
-  "description": "Pruebas para setup inicial, Clase 1 Textract, Clase 2 Textract estructurado y Clase 3 expediente hipotecario.",
+  "description": "Pruebas para setup inicial, Clase 1 Textract, Clase 2 Textract estructurado, Clase 3 expediente hipotecario y Clase 4 Glue.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
